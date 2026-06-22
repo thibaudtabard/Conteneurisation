@@ -1,0 +1,29 @@
+services:
+  # --- SERVICE 1 : FRONTEND (Nginx) ---
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80" # Accessible sur http://localhost:8080
+    depends_on:
+      - backend
+
+  # --- SERVICE 2 : BACKEND (Node.js) ---
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3001" # Accessible sur http://localhost:3001
+    environment:
+      - PORT=${BACKEND_PORT:-3001}
+      - REDIS_HOST=${REDIS_HOST:-cache}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+    depends_on:
+      - cache
+
+  # --- SERVICE 3 : CACHE (Redis) ---
+  cache:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data 
+
+volumes:
+  redis_data:
